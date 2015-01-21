@@ -1,66 +1,55 @@
 app.config([
   '$routeProvider',
-  function($routeProvider){
+  function ($routeProvider){
   $routeProvider.when('/shopping-cart', {
     template : '<shopping-cart></shopping-cart>'
   });
 }]);
 
+app.directive('shoppingCart', [ 
+  'math', 'productService',
+  function (math, productService){
 
-app.directive('shoppingCart', function(){
-  function getProduct(){
-    return { name: 'Eternal Teeshirt', exclPrice: 260.86956, taxRate: 0.15 };
-  };
+    return {
+      restrict : 'E',
+      replace : true,
+      templateUrl : 'shopping-cart.html',
+      controller : ['$scope', function ($scope){
+        $scope.summary = function(){
+          var subTotal = math.chain(0);
+          var total = math.chain(0);
+          $scope.products.forEach(function(product){
+            productService.sumProduct(product);
+            subTotal = subTotal.add(product.subTotal);
+            total = total.add(product.total);
+          });
 
-  return {
-    restrict : 'E',
-    replace : true,
-    templateUrl : 'shopping-cart.html',
-    controller : ['$scope', 'math', function($scope, math){
-      $scope.products = [];
+          $scope.subTotal = subTotal.done();
+          $scope.total = total.round(2).done();
+          $scope.tax = math.chain($scope.total).subtract($scope.subTotal).round(2).done();
+        };
 
-      $scope.taxed = function(price, rate){
-        return math
-          .chain(rate)
-          .add(1)
-          .multiply(price)
-          .round(2)
-          .done();
-      }
+        $scope.addProducts = function(){
+          $scope.products.push(productService.getProduct())
+        };
 
-      $scope.summary = function(){
-        var subTotal = math.chain(0);
-        var tax = math.chain(0);
-        $scope.products.forEach(function(product){
-          subTotal = subTotal.add(product.exclPrice).round(2);
-          tax = tax.add(
-            math
-            .chain(product.exclPrice)
-            .multiply(product.taxRate)
-            .round(2)
-            .done()
-          ).round(2);
-        });
+        $scope.removeProduct = function(product){
+          $scope.products.splice(
+            $scope.products.indexOf(product)
+          ,1);
+        }
 
-        $scope.subTotal = subTotal.done();
-        $scope.tax = tax.done();
-        $scope.total = math
-          .chain($scope.subTotal)
-          .add($scope.tax)
-          .done();
-      };
+        $scope.reset = function(){
+          $scope.products = [];
+          $scope.discount = 0;
+          $scope.inclusive = true;
+        }
 
-      $scope.addProducts = function(){
-        $scope.products.push(getProduct())
-      };
+        $scope.$watch('products', $scope.summary, true);
 
-      $scope.clearAll = function(){
-        $scope.products = [];
-      };
-
-      $scope.$watch('products', $scope.summary, true);
-
-      $scope.summary();
-    }]
+        $scope.reset();
+        $scope.summary();
+      }]
+    }
   }
-});
+]);

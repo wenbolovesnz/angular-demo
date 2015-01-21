@@ -2,11 +2,15 @@ div.shopping-cart
   header
     a.add-product(ng-click="addProducts()") Add Products
   div.list.container
+    div.gst-inclusive-toggle
+      input(type="checkbox" id="inclusive" ng-model="inclusive") 
+      label(for="inclusive") GST Inclusive
     ul
       li(ng-repeat="product in products") 
-        div.quantity 1
+        input.quantity(type="number" ng-model="product.quantity" step="1")
         div.name {{product.name}}
-        div.price {{ taxed(product.exclPrice, product.taxRate) | fixed}}
+        div.price {{ (inclusive ? product.total : product.subTotal) | fixed}}
+        a.delete(ng-click="removeProduct(product)") Remove
   
   div.summary
     div.item.light
@@ -15,8 +19,14 @@ div.shopping-cart
     div.item.light
       div.label Tax (GST)
       div.text {{tax | fixed}}
+    div.item.light.discount
+      div.label Discount
+      div.text 
+        span -
+        input(type="number" ng-model="discount" step="1")
+        span .00
     div.item.bolder
       div.label Total Price
-      div.text {{total | fixed}}
+      div.text {{ (total - discount) > 0 ? (total - discount) : 0 | fixed}}
   footer
-    a.clear-all(ng-click="clearAll()") Boomshakalaka
+    a.clear-all(ng-click="reset()") Boomshakalaka

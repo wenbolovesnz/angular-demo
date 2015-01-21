@@ -6,6 +6,8 @@ $btn
   height $btn-height
   line-height $btn-height
   padding $btn-padding
+  user-select none
+  cursor pointer
   
 $btn-round
   border-radius $btn-round-border-radius
@@ -18,3 +20,10 @@ $btn-primary
   @extend $btn
   background-color $btn-primary-bg-color 
   color $btn-primary-text-color
+  
+
+$btn-danger
+  @extend $btn
+  background-color $btn-danger-bg-color 
+  color $btn-danger-text-color
+  

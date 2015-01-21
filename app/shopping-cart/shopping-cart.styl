@@ -7,31 +7,69 @@
     @extend $btn-round
     @extend $btn-large
     
-  .list li
+  .delete
+    @extend $btn-danger
+    transition .25s
+    transform translate3d(95px,0,0) rotateY(180deg)
+    absolute top 50% right 20px
+    height 20px
+    line-height 20px
+    padding 5px 10px
+    font-size 0.9rem
+    margin-top -16px
+    
+  .gst-inclusive-toggle
+    text-align right
+    padding 5px $page-header-padding
+    background-color $bg-color-light
+    border-bottom 1px solid $border-color
+    font-size 0.9rem
+    
+  li
+    position relative
     padding $page-header-padding
     border-bottom 1px solid $border-color
     background-color $bg-color-light
-    overflow auto
+    perspective 1000px
+    overflow hidden
+    clear-fix()
+    
+    &:hover .delete, &:active .delete
+      transform translate3d(0,0,0) rotateY(0)
     
     .quantity, .name
       float left
-    .price 
-      float right
       
-    .quantity
+    .name
       position relative
-      width 55px
-      
       &:after
         display block
         content "x"
         color $text-color-light
-        absolute top 50% right 15px
+        absolute top 50% left -25px
         margin-top -9px
+      
+    .price 
+      float right
+      
+    .quantity
+      padding-left 10px
+      width 55px
+      border none
+      font-size 0.9rem
+      margin -2px 0
         
   .summary 
     padding-top 5px
     flex 0 0 auto
+    .discount input
+      border none
+      text-align right
+      color $text-color-light
+      font-size 0.9rem
+      width 40px
+      margin -2px 0
+      
     .item
       overflow auto
       padding ($page-header-padding/2) $page-header-padding ($page-header-padding/2) $page-header-padding
