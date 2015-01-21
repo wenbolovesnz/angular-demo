@@ -14,6 +14,8 @@ gulpUtil = require('gulp-util'),
 uglify = require('gulp-uglify'),
 watch = require('gulp-watch'),
 plumber = require('gulp-plumber'),
+ngHtml2Js = require("gulp-ng-html2js"),
+minifyHtml = require("gulp-minify-html"),
 path = require('path');
 runSequence = require('run-sequence'),
 streamqueue = require('streamqueue'),
@@ -65,11 +67,36 @@ gulp.task('js', function(){
         return file.path.substr(file.base.length + 1);
       });
     }))
-    .pipe(livereload());  
+    .pipe(gulpif(config.dev, livereload()));  
   }else{
+    var stream = streamqueue({ objectMode: true });
+    //add bower
+    stream.queue(
+      gulp.src(mainBowerFiles({ base: paths.bower }))
+    );
+    //add jade template
+    stream.queue(
+      gulp.src(paths.app + '/*/**/*.jade')
+      .pipe(plumber())
+      .pipe(jade())
+      .pipe(rename({ dirname : '' }))
+      .pipe(minifyHtml({
+        empty: true,
+        spare: true,
+        quotes: true
+      })).pipe(ngHtml2Js({ moduleName: 'app.templates' }))
+    );
 
+    //add javascript
+    stream.queue(
+      gulp.src(paths.app + '/**/*.js')
+    )
+
+    return stream.done()
+    .pipe(concat('app.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest(paths.dest));
   }
-  
 });
 
 gulp.task('style', function(){
@@ -80,23 +107,20 @@ gulp.task('style', function(){
     compress: !config.dev
   }))
   .pipe(gulp.dest(paths.dest + '/css'))
-  .pipe(livereload());
+  .pipe(gulpif(config.dev, livereload()));
 });
 
-gulp.task('jade', function(){
-  if(config.dev){
-    return gulp.src(paths.app + '/**/*.jade')
-    .pipe(plumber())
-    .pipe(jade({
-      pretty : true,
-      locals : config
-    }))
-    .pipe(rename({
-      dirname : ''
-    }))
-    .pipe(gulp.dest(paths.dest))
-    .pipe(livereload());
-  }
+gulp.task('jade', function() {
+  var files = config.dev ? '/**/*.jade' : '/index.jade';
+  return gulp.src(paths.app + files)
+  .pipe(plumber())
+  .pipe(jade({
+    pretty : config.dev,
+    locals : config
+  }))
+  .pipe(rename({ dirname : '' }))
+  .pipe(gulp.dest(paths.dest))
+  .pipe(gulpif(config.dev, livereload()));
 });
 
 
@@ -121,13 +145,12 @@ gulp.task('watchs', function(cb){
   cb();
 });
 
-gulp.task('build', function(){
+gulp.task('build', function(cb){
   config.dev = false;
   runSequence(
     'path', 
-    'clean', 
-    ['bower', 'style', 'js', 'build-version'], 
-    'jade',
+    ['clean', 'build-version'],
+    ['style', 'js', 'jade'], 
     cb
   ); 
 });
@@ -137,8 +160,8 @@ gulp.task('dev', function(cb){
   livereload.listen(config.livereload_port);
   runSequence(
     'path', 
-    'clean', 
-    ['bower', 'style', 'js', 'build-version'], 
+    ['clean', 'build-version'],
+    ['bower', 'style', 'js'], 
     'jade', 
     ['watchs', 'static-server'], 
     cb
