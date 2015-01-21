@@ -1,34 +1,22 @@
 div.shopping-cart
   header
-    a.add-product Add Products
+    a.add-product(ng-click="addProducts()") Add Products
   div.list.container
     ul
-      li 
+      li(ng-repeat="product in products") 
         div.quantity 1
-        div.name Eternal Teeshirt
-        div.price 300.00
-      li 
-        div.quantity 1
-        div.name Eternal Teeshirt
-        div.price 300.00
-      li 
-        div.quantity 1
-        div.name Eternal Teeshirt
-        div.price 300.00
-      li 
-        div.quantity 1
-        div.name Eternal Teeshirt
-        div.price 300.00
-      
+        div.name {{product.name}}
+        div.price {{ taxed(product.exclPrice, product.taxRate) | fixed}}
+  
   div.summary
     div.item.light
       div.label Sub-total
-      div.text 0
+      div.text {{subTotal | fixed}}
     div.item.light
       div.label Tax (GST)
-      div.text 0
+      div.text {{tax | fixed}}
     div.item.bolder
       div.label Total Price
-      div.text 0
+      div.text {{total | fixed}}
   footer
-    a.clear-all Boomshakalaka
+    a.clear-all(ng-click="clearAll()") Boomshakalaka
