@@ -1,0 +1,17 @@
+@import 'nib'
+@import 'vars'
+@import 'partials/**/*'
+
+global-reset()
+
+html, body
+  height 100%
+  width 100%
+
+body 
+  font-family 'Open Sans', sans-serif
+  background-color $bg-color 
+  color $text-color
+  font-size $font-size
+
+@import '../app/**/*'

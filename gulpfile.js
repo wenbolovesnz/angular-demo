@@ -123,13 +123,26 @@ gulp.task('watchs', function(cb){
 
 gulp.task('build', function(){
   config.dev = false;
+  runSequence(
+    'path', 
+    'clean', 
+    ['bower', 'style', 'js', 'build-version'], 
+    'jade',
+    cb
+  ); 
 });
 
 gulp.task('dev', function(cb){
   config.dev = true;
   livereload.listen(config.livereload_port);
-
-  runSequence('path', 'clean', ['bower', 'style', 'js', 'build-version'], 'jade', ['watchs', 'static-server'], cb); 
+  runSequence(
+    'path', 
+    'clean', 
+    ['bower', 'style', 'js', 'build-version'], 
+    'jade', 
+    ['watchs', 'static-server'], 
+    cb
+  ); 
 });
 
 

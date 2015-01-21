@@ -1,0 +1,45 @@
+.shopping-cart
+  @extend $page
+  .add-product
+    @extend $btn-primary
+  .clear-all
+    @extend $btn-primary
+    @extend $btn-round
+    @extend $btn-large
+    
+  .list li
+    padding $page-header-padding
+    border-bottom 1px solid $border-color
+    background-color $bg-color-light
+    overflow auto
+    
+    .quantity, .name
+      float left
+    .price 
+      float right
+      
+    .quantity
+      position relative
+      width 55px
+      
+      &:after
+        display block
+        content "x"
+        color $text-color-light
+        absolute top 50% right 15px
+        margin-top -9px
+        
+  .summary 
+    padding-top 5px
+    flex 0 0 auto
+    .item
+      overflow auto
+      padding ($page-header-padding/2) $page-header-padding ($page-header-padding/2) $page-header-padding
+      background-color $bg-color-light
+      font-size $shopping-cart-summary-font-size
+      border-top 1px solid $border-color
+      .label 
+        float left
+      .text
+        float right
+      

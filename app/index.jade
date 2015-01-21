@@ -8,7 +8,10 @@ html
     link(rel="stylesheet" href="css/style.css")
     
     script(type='text/javascript').
+      //- buildversion for eazy debug
       var buildVersion = '#{buildVersion}';
+
+    //- when in dev mode inject javascript seperately.  
     if dev
       script(type='text/javascript').
         var livereload = document.createElement('script');
@@ -23,7 +26,11 @@ html
         script(src=js[i]) 
       - }
     else
+      //- all js files and template should be minified to one file in production 
       script(src="app.js")     
-  body 
+  body
+    ng-view
+    //- lazy load not important file, increase page display speed
+    link(href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,700' rel='stylesheet' type='text/css')
 
 
